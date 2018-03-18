@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/filter"
+        android:title=""
+        android:icon="@drawable/ic_filter_list_white_24dp"
+        android:orderInCategory="50"
+        app:showAsAction="ifRoom">
+
+    </item>
+    <item
+        android:id="@+id/empty"
+        android:title=""
+        android:icon="@drawable/ic_more_horiz_white_24dp"
+        android:orderInCategory="101"
+        app:showAsAction="always">
+
+        <menu>
+            <item
+                android:id="@+id/settings"
+                android:checkable="false"
+                android:title="@string/action_settings"/>
+
+        </menu>
+
+    </item>
+
+
+</menu>

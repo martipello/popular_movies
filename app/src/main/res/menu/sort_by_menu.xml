@@ -1,0 +1,21 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/empty"
+        android:title=""
+        android:icon="@drawable/ic_more_horiz_white_24dp"
+        android:orderInCategory="101"
+        app:showAsAction="always"/>
+    <item
+        android:id="@+id/sort_by"
+        android:title="@string/sort_by"/>
+    <item
+        android:id="@+id/spinner"
+        android:title="@string/sort_by"
+        app:actionViewClass="android.widget.Spinner"
+        android:background="#ff00" />
+    <item
+        android:id="@+id/ok_button"
+        app:actionViewClass="android.widget.Button"
+        android:title="@string/ok"/>
+</menu>
