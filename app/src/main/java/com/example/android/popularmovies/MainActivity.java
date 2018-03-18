@@ -1,12 +1,20 @@
 package com.example.android.popularmovies;
 
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.AsyncTaskLoader;
+import android.support.v4.content.Loader;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -14,6 +22,7 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -38,7 +47,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity  {
 
     public String filter;
     private final static String POPULAR = "popular";
@@ -57,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
     public static ArrayList<MovieObject> movieList = new ArrayList<>();
     public RecyclerView recyclerView;
     TextView connectionText;
+    private SQLiteDatabase movieDB;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,9 +89,10 @@ public class MainActivity extends AppCompatActivity {
         sortByRated = prefs.getBoolean(TOP_RATED, false);
         sortByPopular = prefs.getBoolean(POPULAR, false);
         sortByFav = prefs.getBoolean(FAVOURITES, false);
-
         staggeredGridLayoutManagerVertical = new StaggeredGridLayoutManager(columns,StaggeredGridLayoutManager.VERTICAL);
         recyclerView = (RecyclerView) findViewById(R.id.list_view);
+        DatabaseHelper databaseHelper = new DatabaseHelper(this);
+        movieDB = databaseHelper.getReadableDatabase();
         OnItemTouchListener itemTouchListener = new MainActivity.OnItemTouchListener() {
             @Override
             public void onCardClick(View view, int position) {
@@ -92,17 +103,14 @@ public class MainActivity extends AppCompatActivity {
             }
         };
         if (sortByRated){
-            System.out.println("rate onCreate");
             movieAdapter = new MovieAdapter(movieList,MainActivity.this,itemTouchListener,true);
             sortMoviesBy(TOP_RATED);
         }
         else if (sortByPopular){
-            System.out.println("pop onCreate");
             movieAdapter = new MovieAdapter(movieList,MainActivity.this,itemTouchListener,true);
             sortMoviesBy(POPULAR);
         }
         else if (sortByFav){
-            System.out.println("fav onCreate");
             movieAdapter = new MovieAdapter(movieList,MainActivity.this,itemTouchListener,false);
             sortMoviesBy(FAVOURITES);
         }
@@ -181,9 +189,13 @@ public class MainActivity extends AppCompatActivity {
             });
         }else{
             System.out.println("fav sort method");
-            String URL = "content://com.example.android.popularmovies.MovieProvider/movie";
-            Uri movie = Uri.parse(URL);
-            Cursor c = managedQuery(movie, null, null, null,"title");
+
+            //Cursor cursor = getFavourites();
+            //new WordFetchTask().execute();
+
+            //String URL = "content://com.example.android.popularmovies.MovieProvider/movie";
+            //Uri movie = Uri.parse(URL);
+            Cursor c = getFavourites();
             if (c.moveToFirst()) {
                 do{
                     MovieObject movieObject = new MovieObject(c.getInt(c.getColumnIndex( MovieProvider.MOVIE_DATABASE_ID)),
@@ -205,6 +217,16 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         swipeRefreshLayout.setRefreshing(false);
+    }
+
+    public Cursor getFavourites(){
+        return movieDB.query(MovieContract.MovieEntry.TABLE_NAME,
+                null,
+                null,
+                null,
+                null,
+                null,
+                MovieContract.MovieEntry.MOVIE_DATABASE_ID);
     }
 
     public interface OnItemTouchListener {
@@ -274,6 +296,11 @@ public class MainActivity extends AppCompatActivity {
                 })
                 .positiveText(R.string.apply)
                 .show();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
     }
 
     @Override

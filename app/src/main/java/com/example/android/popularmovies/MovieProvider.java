@@ -24,10 +24,10 @@ import java.util.Objects;
 
 public class MovieProvider extends ContentProvider {
 
+    private SQLiteDatabase sqLiteDatabase;
     static final String PROVIDER_NAME = "com.example.android.popularmovies.MovieProvider";
     static final String URL = "content://" + PROVIDER_NAME + "/movie";
     static final Uri CONTENT_URI = Uri.parse(URL);
-
     static final String _ID = "_id";
     static final String MOVIE_DATABASE_ID = "movie_id";
     static final String TITLE = "title";
@@ -36,56 +36,23 @@ public class MovieProvider extends ContentProvider {
     static final String BACKDROP_PATH = "backdrop_path";
     static final String RELEASE_DATE = "release_date";
     static final String RATING = "rating";
-
     private static HashMap<String, String> MOVIE_PROJECTION_MAP;
-
     static final int MOVIE = 1;
     static final int MOVIE_ID = 2;
-
     static final UriMatcher uriMatcher;
     static {
         uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
         uriMatcher.addURI(PROVIDER_NAME, "movie", MOVIE);
         uriMatcher.addURI(PROVIDER_NAME, "movie/#", MOVIE_ID);
     }
+    private DatabaseHelper databaseHelper;
 
-    private SQLiteDatabase sqLiteDatabase;
-    static final String DATABASE_NAME = "favourites";
-    static final String MOVIE_TABLE_NAME = "movies";
-    static final int DATABASE_VERSION = 1;
-    static final String CREATE_DB_TABLE =
-            " CREATE TABLE " + MOVIE_TABLE_NAME +
-                    " (_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    " movie_id INTEGER, " +
-                    " title TEXT NOT NULL, " +
-                    " overview TEXT NOT NULL, " +
-                    " poster_path TEXT NOT NULL, " +
-                    " backdrop_path TEXT NOT NULL, " +
-                    " release_date TEXT NOT NULL, " +
-                    " rating DOUBLE NOT NULL);";
-
-    private static class DatabaseHelper extends SQLiteOpenHelper {
-        DatabaseHelper(Context context) {
-            super(context, DATABASE_NAME, null, DATABASE_VERSION);
-        }
-
-        @Override
-        public void onCreate(SQLiteDatabase sqLiteDatabase) {
-            sqLiteDatabase.execSQL(CREATE_DB_TABLE);
-        }
-
-        @Override
-        public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
-            sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + MOVIE_TABLE_NAME);
-            onCreate(sqLiteDatabase);
-        }
-    }
     @Override
     public boolean onCreate() {
         Context context = getContext();
-        DatabaseHelper databaseHelper = new DatabaseHelper(context);
+        databaseHelper = new DatabaseHelper(context);
         sqLiteDatabase = databaseHelper.getWritableDatabase();
-        return sqLiteDatabase != null;
+        return true;
     }
 
     @Nullable
@@ -94,7 +61,7 @@ public class MovieProvider extends ContentProvider {
                         @Nullable String s, @Nullable String[] strings1,
                         @Nullable String s1) {
         SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
-        qb.setTables(MOVIE_TABLE_NAME);
+        qb.setTables(MovieContract.MovieEntry.TABLE_NAME);
         switch (uriMatcher.match(uri)){
             case MOVIE:
                 qb.setProjectionMap(MOVIE_PROJECTION_MAP);
@@ -127,7 +94,7 @@ public class MovieProvider extends ContentProvider {
     @Nullable
     @Override
     public Uri insert(@NonNull Uri uri, @Nullable ContentValues contentValues) {
-        long rowID = sqLiteDatabase.insert( MOVIE_TABLE_NAME,"",contentValues );
+        long rowID = sqLiteDatabase.insert(MovieContract.MovieEntry.TABLE_NAME,"",contentValues );
         if (rowID > 0){
             Uri mUri = ContentUris.withAppendedId(CONTENT_URI,rowID);
             getContext().getContentResolver().notifyChange(mUri, null);
@@ -141,11 +108,11 @@ public class MovieProvider extends ContentProvider {
         int count = 0;
         switch (uriMatcher.match(uri)){
             case MOVIE:
-                count = sqLiteDatabase.delete(MOVIE_TABLE_NAME, s ,strings);
+                count = sqLiteDatabase.delete(MovieContract.MovieEntry.TABLE_NAME, s ,strings);
                 break;
             case MOVIE_ID:
                 String id = uri.getPathSegments().get(1);
-                count = sqLiteDatabase.delete( MOVIE_TABLE_NAME, _ID + " = " + id +
+                count = sqLiteDatabase.delete( MovieContract.MovieEntry.TABLE_NAME, _ID + " = " + id +
                         (!TextUtils.isEmpty(s) ? "AND (" + s + ')' : ""),strings);
                 break;
             default:
@@ -160,11 +127,11 @@ public class MovieProvider extends ContentProvider {
             int count = 0;
             switch (uriMatcher.match(uri)) {
                 case MOVIE:
-                    count = sqLiteDatabase.update(MOVIE_TABLE_NAME, contentValues, s, strings);
+                    count = sqLiteDatabase.update(MovieContract.MovieEntry.TABLE_NAME, contentValues, s, strings);
                     break;
 
                 case MOVIE_ID:
-                    count = sqLiteDatabase.update(MOVIE_TABLE_NAME, contentValues,_ID +
+                    count = sqLiteDatabase.update(MovieContract.MovieEntry.TABLE_NAME, contentValues,_ID +
 
                     " = " + uri.getPathSegments().get(1) + (!TextUtils.isEmpty(s) ? "AND ("
                     +s +')' : ""), strings);

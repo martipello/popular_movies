@@ -2,6 +2,8 @@ package com.example.android.popularmovies;
 
 import android.content.ContentValues;
 import android.content.SharedPreferences;
+import android.database.SQLException;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
@@ -55,6 +57,7 @@ public class MovieDetailActivity extends AppCompatActivity {
     public static ArrayList<MovieTrailerObject> trailerList = new ArrayList<>();
     public RecyclerView recyclerView;
     public Bitmap myBitmap;
+    private SQLiteDatabase movieDB;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +68,8 @@ public class MovieDetailActivity extends AppCompatActivity {
         ratingBar = findViewById(R.id.ratings_bar);
         overview = findViewById(R.id.overview);
         released = findViewById(R.id.release_date);
+        DatabaseHelper databaseHelper = new DatabaseHelper(this);
+        movieDB = databaseHelper.getWritableDatabase();
         final ImageView imageView = findViewById(R.id.expandedImage);
         final Bundle data = getIntent().getExtras();
         if (data != null) {
@@ -174,15 +179,30 @@ public class MovieDetailActivity extends AppCompatActivity {
                 setFileName(movieObject.getId() + ".png").
                 setDirectoryName("fav_movies").
                 save(bitmap);
-        values.put(MovieProvider.TITLE, movieObject.getTitle());
-        values.put(MovieProvider.MOVIE_DATABASE_ID, movieObject.getId());
-        values.put(MovieProvider.OVERVIEW, movieObject.getOverview());
-        values.put(MovieProvider.RATING, movieObject.getRating());
-        values.put(MovieProvider.RELEASE_DATE, movieObject.getRelease_dates());
-        values.put(MovieProvider.POSTER_PATH, "NULL");
-        values.put(MovieProvider.BACKDROP_PATH, "BACKDROP");
-        Uri uri = getContentResolver().insert(
-                MovieProvider.CONTENT_URI, values);
+        values.put(MovieContract.MovieEntry.TITLE, movieObject.getTitle());
+        values.put(MovieContract.MovieEntry.MOVIE_DATABASE_ID, movieObject.getId());
+        values.put(MovieContract.MovieEntry.OVERVIEW, movieObject.getOverview());
+        values.put(MovieContract.MovieEntry.RATING, movieObject.getRating());
+        values.put(MovieContract.MovieEntry.RELEASE_DATE, movieObject.getRelease_dates());
+        values.put(MovieContract.MovieEntry.POSTER_PATH, "NULL");
+        values.put(MovieContract.MovieEntry.BACKDROP_PATH, "BACKDROP");
+        //Uri uri = getContentResolver().insert(
+         //       MovieProvider.CONTENT_URI, values);
+        try
+        {
+            movieDB.beginTransaction();
+            //go through the list and add one by one
+            movieDB.insert(MovieContract.MovieEntry.TABLE_NAME, null, values);
+            movieDB.setTransactionSuccessful();
+        }
+        catch (SQLException e) {
+            //too bad :(
+        }
+        finally
+        {
+            movieDB.endTransaction();
+        }
+
     }
 
     public void loadImage(MovieObject movieObject, final ImageView imageView){
