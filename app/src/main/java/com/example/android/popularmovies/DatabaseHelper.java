@@ -33,6 +33,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         MovieContract.MovieEntry.RATING + " DOUBLE NOT NULL);";
         sqLiteDatabase.execSQL(CREATE_DB_TABLE);
     }
+    //" UNIQUE (" + WeatherEntry.COLUMN_DATE + ") ON CONFLICT REPLACE);";
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {

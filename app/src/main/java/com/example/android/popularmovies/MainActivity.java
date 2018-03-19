@@ -102,16 +102,14 @@ public class MainActivity extends AppCompatActivity  {
             public void onCardLongClick(View view, int position) {
             }
         };
+        movieAdapter = new MovieAdapter(movieList,MainActivity.this,itemTouchListener,false);
         if (sortByRated){
-            movieAdapter = new MovieAdapter(movieList,MainActivity.this,itemTouchListener,true);
             sortMoviesBy(TOP_RATED);
         }
         else if (sortByPopular){
-            movieAdapter = new MovieAdapter(movieList,MainActivity.this,itemTouchListener,true);
             sortMoviesBy(POPULAR);
         }
         else if (sortByFav){
-            movieAdapter = new MovieAdapter(movieList,MainActivity.this,itemTouchListener,false);
             sortMoviesBy(FAVOURITES);
         }
         ItemTouchHelper.Callback callback =
@@ -148,8 +146,8 @@ public class MainActivity extends AppCompatActivity  {
     }
 
     public void sortMoviesBy(String sortOrder) {
-        movieList.clear();
         if(!sortByFav){
+            movieList.clear();
             HttpLoggingInterceptor httpLoggingInterceptor = new HttpLoggingInterceptor();
             httpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
             OkHttpClient okHttpClient = new OkHttpClient.Builder().addInterceptor(new Interceptor() {
@@ -188,8 +186,6 @@ public class MainActivity extends AppCompatActivity  {
                 }
             });
         }else{
-            System.out.println("fav sort method");
-
             //Cursor cursor = getFavourites();
             //new WordFetchTask().execute();
 
@@ -197,6 +193,7 @@ public class MainActivity extends AppCompatActivity  {
             //Uri movie = Uri.parse(URL);
             Cursor c = getFavourites();
             if (c.moveToFirst()) {
+                movieList.clear();
                 do{
                     MovieObject movieObject = new MovieObject(c.getInt(c.getColumnIndex( MovieProvider.MOVIE_DATABASE_ID)),
                             c.getString(c.getColumnIndex( MovieProvider.TITLE)),
@@ -205,15 +202,14 @@ public class MainActivity extends AppCompatActivity  {
                             c.getDouble(c.getColumnIndex( MovieProvider.RATING)),
                             c.getString(c.getColumnIndex( MovieProvider.BACKDROP_PATH)));
                     movieList.add(movieObject);
-                    System.out.println("while looping");
                 } while (c.moveToNext());
-                System.out.println("while finished");
-                movieAdapter.refreshMyList(movieList,false);
-                if (movieAdapter.getItemCount() > 0){
-                    connectionText.setVisibility(View.INVISIBLE);
-                }else{
-                    connectionText.setVisibility(View.VISIBLE);
-                }
+            }
+            c.moveToFirst();
+            movieAdapter.refreshMyList(movieList,false);
+            if (movieAdapter.getItemCount() > 0){
+                connectionText.setVisibility(View.INVISIBLE);
+            }else{
+                connectionText.setVisibility(View.VISIBLE);
             }
         }
         swipeRefreshLayout.setRefreshing(false);
