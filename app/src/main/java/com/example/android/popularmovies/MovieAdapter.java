@@ -90,12 +90,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MyViewHolder
     public void refreshMyList(List<MovieObject> list , Boolean online){
         this.online = online;
         movieAdapterList.clear();
-        System.out.println("adapter list size " + movieAdapterList.size());
-        System.out.println("arg list size " + list.size());
         movieAdapterList.addAll(list);
-        System.out.println("adapter list size " + movieAdapterList.size());
-        System.out.println("arg list size " + list.size());
-        System.out.println("refresh " + online);
         notifyDataSetChanged();
     }
 

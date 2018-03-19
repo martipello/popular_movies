@@ -1,7 +1,9 @@
 package com.example.android.popularmovies;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
@@ -12,6 +14,7 @@ import android.preference.PreferenceManager;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -19,6 +22,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RatingBar;
@@ -41,6 +45,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+
 public class MovieDetailActivity extends AppCompatActivity {
     CollapsingToolbarLayout collapsingToolbarLayout;
     private final static String FAVOURITES = "favourites";
@@ -51,12 +56,15 @@ public class MovieDetailActivity extends AppCompatActivity {
     TextView released , overview;
     FloatingActionButton fab;
     RatingBar ratingBar;
+    Context context;
     private static ItemTouchHelper mItemTouchHelper;
     private StaggeredGridLayoutManager staggeredGridLayoutManagerVertical;
     public MovieTrailerAdapter trailerAdapter;
     public static ArrayList<MovieTrailerObject> trailerList = new ArrayList<>();
     public RecyclerView recyclerView;
     public Bitmap myBitmap;
+    //public int _ID;
+    public boolean favourite;
     private SQLiteDatabase movieDB;
 
     @Override
@@ -72,10 +80,18 @@ public class MovieDetailActivity extends AppCompatActivity {
         movieDB = databaseHelper.getWritableDatabase();
         final ImageView imageView = findViewById(R.id.expandedImage);
         final Bundle data = getIntent().getExtras();
+        context = this;
         if (data != null) {
             movieObject = (MovieObject) data.getParcelable("movie");
             populateViews(movieObject);
             loadImage(movieObject,imageView);
+            /*
+            if (data.containsKey("column")){
+                System.out.println("has key");
+                _ID = data.getInt("column");
+            }
+            */
+            favourite = exists(movieObject.getTitle());
         }
         toolbar.setTitle("");
         setSupportActionBar(toolbar);
@@ -88,7 +104,6 @@ public class MovieDetailActivity extends AppCompatActivity {
         MovieDetailActivity.OnItemTouchListener itemTouchListener = new MovieDetailActivity.OnItemTouchListener() {
             @Override
             public void onCardClick(View view, int position) {
-                //showDetailActivity(position);
             }
             @Override
             public void onCardLongClick(View view, int position) {
@@ -104,10 +119,24 @@ public class MovieDetailActivity extends AppCompatActivity {
         recyclerView.setAdapter(trailerAdapter);
         //toolbar.setExpandedTitleColor(getResources().getColor(android.R.color.transparent));
         fab = (FloatingActionButton) findViewById(R.id.fab);
+            if (favourite){
+                favourite = true;
+                fab.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_star_white_24dp));
+            }else{
+                fab.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_star_border_white_24dp));
+                favourite = false;
+            }
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                    addFavourite(movieObject, myBitmap);
+                    if (favourite){
+                        fab.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_star_border_white_24dp));
+                        removeFavourite(movieObject.getTitle());
+                    }
+                    else{
+                        fab.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_star_white_24dp));
+                        addFavourite(movieObject, myBitmap);
+                    }
             }
         });
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -174,6 +203,7 @@ public class MovieDetailActivity extends AppCompatActivity {
     }
 
     public void addFavourite(MovieObject movieObject, Bitmap bitmap){
+        favourite = true;
         ContentValues values = new ContentValues();
         new ImageSaver(this).
                 setFileName(movieObject.getId() + ".png").
@@ -186,23 +216,42 @@ public class MovieDetailActivity extends AppCompatActivity {
         values.put(MovieContract.MovieEntry.RELEASE_DATE, movieObject.getRelease_dates());
         values.put(MovieContract.MovieEntry.POSTER_PATH, "NULL");
         values.put(MovieContract.MovieEntry.BACKDROP_PATH, "BACKDROP");
-        //Uri uri = getContentResolver().insert(
-         //       MovieProvider.CONTENT_URI, values);
         try
         {
             movieDB.beginTransaction();
-            //go through the list and add one by one
             movieDB.insert(MovieContract.MovieEntry.TABLE_NAME, null, values);
             movieDB.setTransactionSuccessful();
         }
         catch (SQLException e) {
-            //too bad :(
         }
         finally
         {
             movieDB.endTransaction();
         }
+    }
 
+    public void removeFavourite(String id){
+        //find a way to get an id
+        favourite = false;
+        movieDB.beginTransaction();
+        movieDB.delete(MovieContract.MovieEntry.TABLE_NAME, id , null);
+        movieDB.endTransaction();
+
+    }
+
+    public boolean exists(String id){
+            String selectString = "SELECT * FROM " + MovieContract.MovieEntry.TABLE_NAME + " WHERE " + MovieContract.MovieEntry._ID + " =?";
+            Cursor cursor = movieDB.rawQuery(selectString, new String[] {id});
+            boolean hasObject = false;
+            if(cursor.moveToFirst()){
+                hasObject = true;
+                int count = 0;
+                while(cursor.moveToNext()){
+                    count++;
+                }
+            }
+            cursor.close();
+            return hasObject;
     }
 
     public void loadImage(MovieObject movieObject, final ImageView imageView){

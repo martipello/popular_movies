@@ -70,6 +70,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     public RecyclerView recyclerView;
     TextView connectionText;
     private SQLiteDatabase movieDB;
+    private Cursor cursor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,7 +106,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             }
         };
         movieAdapter = new MovieAdapter(movieList,MainActivity.this,itemTouchListener,false);
-        /*
         if (sortByRated){
             sortMoviesBy(TOP_RATED);
         }
@@ -115,7 +115,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         else if (sortByFav){
             sortMoviesBy(FAVOURITES);
         }
-        */
         ItemTouchHelper.Callback callback =
                 new touchHelperCallback(movieAdapter);
         mItemTouchHelper = new ItemTouchHelper(callback);
@@ -126,17 +125,15 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                /*
                 if (sortByRated)
                     sortMoviesBy(TOP_RATED);
                 if (sortByPopular)
                     sortMoviesBy(POPULAR);
                 if (sortByFav)
                     sortMoviesBy(FAVOURITES);
-                    */
             }
         });
-        getSupportLoaderManager().initLoader(LOADER, null, this);
+
     }
 
     public void showDetailActivity(int position){
@@ -148,6 +145,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 movieList.get(position).getPoster(),
                 movieList.get(position).getRating(),
                 movieList.get(position).getRelease_dates()));
+        //if (sortByFav)
+        //    myIntent.putExtra("column" , cursor.getInt(cursor.getColumnIndex(MovieContract.MovieEntry._ID)));
         MainActivity.this.startActivity(myIntent);
     }
 
@@ -192,43 +191,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 }
             });
         }else{
-            //Cursor cursor = getFavourites();
-            //new WordFetchTask().execute();
-
-            //String URL = "content://com.example.android.popularmovies.MovieProvider/movie";
-            //Uri movie = Uri.parse(URL);
-            Cursor c = getFavourites();
-            if (c.moveToFirst()) {
-                movieList.clear();
-                do{
-                    MovieObject movieObject = new MovieObject(c.getInt(c.getColumnIndex( MovieProvider.MOVIE_DATABASE_ID)),
-                            c.getString(c.getColumnIndex( MovieProvider.TITLE)),
-                            c.getString(c.getColumnIndex( MovieProvider.OVERVIEW)),
-                            c.getString(c.getColumnIndex( MovieProvider.POSTER_PATH)),
-                            c.getDouble(c.getColumnIndex( MovieProvider.RATING)),
-                            c.getString(c.getColumnIndex( MovieProvider.BACKDROP_PATH)));
-                    movieList.add(movieObject);
-                } while (c.moveToNext());
-            }
-            c.moveToFirst();
-            movieAdapter.refreshMyList(movieList,false);
-            if (movieAdapter.getItemCount() > 0){
-                connectionText.setVisibility(View.INVISIBLE);
-            }else{
-                connectionText.setVisibility(View.VISIBLE);
-            }
+            getSupportLoaderManager().initLoader(LOADER, null, this);
         }
         swipeRefreshLayout.setRefreshing(false);
-    }
-
-    public Cursor getFavourites(){
-        return movieDB.query(MovieContract.MovieEntry.TABLE_NAME,
-                null,
-                null,
-                null,
-                null,
-                null,
-                MovieContract.MovieEntry.MOVIE_DATABASE_ID);
     }
 
     @NonNull
@@ -247,9 +212,12 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @Override
     public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor data) {
-        data.move(0);
+        ArrayList<MovieObject> databaseMovieList = new ArrayList<>();
+        if (data != null && data.getCount() > 0){
+            cursor = data;
+        }
+        data.moveToFirst();
         if (data.moveToFirst()) {
-            movieList.clear();
             do{
                 MovieObject movieObject = new MovieObject(
                         data.getInt(data.getColumnIndex( MovieProvider.MOVIE_DATABASE_ID)),
@@ -258,13 +226,12 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                         data.getString(data.getColumnIndex( MovieProvider.POSTER_PATH)),
                         data.getDouble(data.getColumnIndex( MovieProvider.RATING)),
                         data.getString(data.getColumnIndex( MovieProvider.BACKDROP_PATH)));
-                movieList.add(movieObject);
-                System.out.println("looping " + movieList.size());
+                databaseMovieList.add(movieObject);
+                System.out.println("looping " + databaseMovieList.size());
             } while (data.moveToNext());
         }
         data.moveToFirst();
-        System.out.println(movieList.size());
-        movieAdapter.refreshMyList(movieList,false);
+        movieAdapter.refreshMyList(databaseMovieList,false);
         if (movieAdapter.getItemCount() > 0){
             connectionText.setVisibility(View.INVISIBLE);
         }else{
