@@ -14,6 +14,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
+import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -47,7 +48,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class MainActivity extends AppCompatActivity  {
+public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
     public String filter;
     private final static String POPULAR = "popular";
@@ -55,6 +56,8 @@ public class MainActivity extends AppCompatActivity  {
     private final static String FAVOURITES = "favourites";
     public static final String EXTRA_IMAGE = "EXTRA_IMAGE";
     public static final String EXTRA_TITLE = "EXTRA_TITLE";
+    private static final String TAG = "Cursor";
+    private static final int LOADER = 44;
     public MovieAdapter movieAdapter;
     MoviePageResults pageResults;
     public boolean sortByPopular;
@@ -76,7 +79,6 @@ public class MainActivity extends AppCompatActivity  {
         connectionText = findViewById(R.id.no_connection);
         connectionText.setVisibility(View.INVISIBLE);
         int columns = getResources().getInteger(R.integer.columns);
-        movieList.clear();
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         SharedPreferences.Editor editor = prefs.edit();
         if (!prefs.getBoolean("RAN_ONCE",false)){
@@ -103,6 +105,7 @@ public class MainActivity extends AppCompatActivity  {
             }
         };
         movieAdapter = new MovieAdapter(movieList,MainActivity.this,itemTouchListener,false);
+        /*
         if (sortByRated){
             sortMoviesBy(TOP_RATED);
         }
@@ -112,6 +115,7 @@ public class MainActivity extends AppCompatActivity  {
         else if (sortByFav){
             sortMoviesBy(FAVOURITES);
         }
+        */
         ItemTouchHelper.Callback callback =
                 new touchHelperCallback(movieAdapter);
         mItemTouchHelper = new ItemTouchHelper(callback);
@@ -122,15 +126,17 @@ public class MainActivity extends AppCompatActivity  {
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
+                /*
                 if (sortByRated)
                     sortMoviesBy(TOP_RATED);
                 if (sortByPopular)
                     sortMoviesBy(POPULAR);
                 if (sortByFav)
                     sortMoviesBy(FAVOURITES);
+                    */
             }
         });
-
+        getSupportLoaderManager().initLoader(LOADER, null, this);
     }
 
     public void showDetailActivity(int position){
@@ -223,6 +229,51 @@ public class MainActivity extends AppCompatActivity  {
                 null,
                 null,
                 MovieContract.MovieEntry.MOVIE_DATABASE_ID);
+    }
+
+    @NonNull
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, @Nullable Bundle args) {
+                //Uri forecastQueryUri = WeatherContract.WeatherEntry.CONTENT_URI;
+                Uri uri = MovieProvider.CONTENT_URI;
+                String sortOrder = MovieContract.MovieEntry.TITLE;
+                return new CursorLoader(this,
+                        uri,
+                        null,
+                        null,
+                        null,
+                        sortOrder);
+    }
+
+    @Override
+    public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor data) {
+        data.move(0);
+        if (data.moveToFirst()) {
+            movieList.clear();
+            do{
+                MovieObject movieObject = new MovieObject(
+                        data.getInt(data.getColumnIndex( MovieProvider.MOVIE_DATABASE_ID)),
+                        data.getString(data.getColumnIndex( MovieProvider.TITLE)),
+                        data.getString(data.getColumnIndex( MovieProvider.OVERVIEW)),
+                        data.getString(data.getColumnIndex( MovieProvider.POSTER_PATH)),
+                        data.getDouble(data.getColumnIndex( MovieProvider.RATING)),
+                        data.getString(data.getColumnIndex( MovieProvider.BACKDROP_PATH)));
+                movieList.add(movieObject);
+                System.out.println("looping " + movieList.size());
+            } while (data.moveToNext());
+        }
+        data.moveToFirst();
+        System.out.println(movieList.size());
+        movieAdapter.refreshMyList(movieList,false);
+        if (movieAdapter.getItemCount() > 0){
+            connectionText.setVisibility(View.INVISIBLE);
+        }else{
+            connectionText.setVisibility(View.VISIBLE);
+        }
+    }
+
+    @Override
+    public void onLoaderReset(@NonNull Loader<Cursor> loader) {
     }
 
     public interface OnItemTouchListener {

@@ -88,16 +88,20 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MyViewHolder
     }
 
     public void refreshMyList(List<MovieObject> list , Boolean online){
-        System.out.println("refresh" + online);
         this.online = online;
-        this.movieAdapterList.clear();
-        this.movieAdapterList.addAll(list);
-        this.notifyDataSetChanged();
+        movieAdapterList.clear();
+        System.out.println("adapter list size " + movieAdapterList.size());
+        System.out.println("arg list size " + list.size());
+        movieAdapterList.addAll(list);
+        System.out.println("adapter list size " + movieAdapterList.size());
+        System.out.println("arg list size " + list.size());
+        System.out.println("refresh " + online);
+        notifyDataSetChanged();
     }
 
     public void clear(){
-        this.movieAdapterList.clear();
-        this.notifyDataSetChanged();
+        movieAdapterList.clear();
+        notifyDataSetChanged();
     }
 
     @Override

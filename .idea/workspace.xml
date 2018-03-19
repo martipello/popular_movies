@@ -6,6 +6,7 @@
     </shared>
   </component>
   <component name="AndroidLogFilters">
+    <option name="TOOL_WINDOW_CUSTOM_FILTER" value="system.out" />
     <option name="TOOL_WINDOW_CONFIGURED_FILTER" value="No Filters" />
   </component>
   <component name="ChangeListManager">
@@ -19,8 +20,8 @@
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gradle/4.1/taskHistory/taskHistory.bin" afterPath="$PROJECT_DIR$/.gradle/4.1/taskHistory/taskHistory.bin" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gradle/4.1/taskHistory/taskHistory.lock" afterPath="$PROJECT_DIR$/.gradle/4.1/taskHistory/taskHistory.lock" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/example/android/popularmovies/DatabaseHelper.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/android/popularmovies/DatabaseHelper.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/example/android/popularmovies/MainActivity.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/android/popularmovies/MainActivity.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/example/android/popularmovies/MovieAdapter.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/android/popularmovies/MovieAdapter.java" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -44,77 +45,41 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="MainActivity.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="MainActivity.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/android/popularmovies/MainActivity.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="647">
-              <caret line="203" column="47" lean-forward="true" selection-start-line="203" selection-start-column="47" selection-end-line="203" selection-end-column="47" />
+            <state relative-caret-position="423">
+              <caret line="265" column="8" lean-forward="false" selection-start-line="265" selection-start-column="8" selection-end-line="266" selection-end-column="52" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="method#showDetailActivity#0;class#MainActivity#0" expanded="false" />
-                <marker date="1521456403030" expanded="false" signature="9986:13252" ph="{...}" />
-                <marker date="1521456403030" expanded="false" signature="10407:10423" ph="&quot;Sort By&quot;" />
-                <marker date="1521456403030" expanded="false" signature="10450:10473" ph="&quot;Filter content by:&quot;" />
-                <marker date="1521456403030" expanded="false" signature="10580:10770" ph="(dialog, view, which, text) → {" />
-                <marker date="1521456403030" expanded="false" signature="13151:13174" ph="}" />
-                <marker date="1521456403030" expanded="false" signature="13206:13220" ph="&quot;Apply&quot;" />
-                <marker date="1521456403030" expanded="false" signature="13297:13308" ph=" { " />
-                <marker date="1521456403030" expanded="false" signature="13325:13331" ph=" }" />
-                <marker date="1521456403030" expanded="false" signature="13402:13413" ph=" { " />
-                <marker date="1521456403030" expanded="false" signature="13449:13455" ph=" }" />
-                <marker date="1521456403030" expanded="false" signature="13540:13605" ph="{...}" />
-                <marker date="1521456403030" expanded="false" signature="13670:13681" ph=" { " />
-                <marker date="1521456403030" expanded="false" signature="13720:13726" ph=" }" />
-                <marker date="1521456403030" expanded="false" signature="13793:13913" ph="{...}" />
-                <marker date="1521456403030" expanded="false" signature="13985:14315" ph="{...}" />
+                <element signature="method#sortMoviesBy#0;class#MainActivity#0" expanded="false" />
+                <element signature="method#getFavourites#0;class#MainActivity#0" expanded="false" />
+                <marker date="1521465855961" expanded="false" signature="12553:12569" ph="&quot;Sort By&quot;" />
+                <marker date="1521465855961" expanded="false" signature="12596:12619" ph="&quot;Filter content by:&quot;" />
+                <marker date="1521465855961" expanded="false" signature="12726:12916" ph="(dialog, view, which, text) → {" />
+                <marker date="1521465855961" expanded="false" signature="15297:15320" ph="}" />
+                <marker date="1521465855961" expanded="false" signature="15352:15366" ph="&quot;Apply&quot;" />
+                <marker date="1521465855961" expanded="false" signature="15443:15454" ph=" { " />
+                <marker date="1521465855961" expanded="false" signature="15471:15477" ph=" }" />
+                <marker date="1521465855961" expanded="false" signature="15548:15559" ph=" { " />
+                <marker date="1521465855961" expanded="false" signature="15595:15601" ph=" }" />
+                <marker date="1521465855961" expanded="false" signature="15686:15751" ph="{...}" />
+                <marker date="1521465855961" expanded="false" signature="15816:15827" ph=" { " />
+                <marker date="1521465855961" expanded="false" signature="15866:15872" ph=" }" />
+                <marker date="1521465855961" expanded="false" signature="15939:16059" ph="{...}" />
+                <marker date="1521465855961" expanded="false" signature="16131:16461" ph="{...}" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="DatabaseHelper.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/android/popularmovies/DatabaseHelper.java">
+      <file leaf-file-name="MovieAdapter.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/android/popularmovies/MovieAdapter.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="62">
-              <caret line="24" column="72" lean-forward="false" selection-start-line="24" selection-start-column="72" selection-end-line="24" selection-end-column="72" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="MovieProvider.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/android/popularmovies/MovieProvider.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1296">
-              <caret line="52" column="8" lean-forward="false" selection-start-line="52" selection-start-column="8" selection-end-line="52" selection-end-column="8" />
-              <folding>
-                <element signature="method#query#0;class#MovieProvider#0" expanded="false" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="MovieContract.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/android/popularmovies/MovieContract.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="134">
-              <caret line="8" column="28" lean-forward="false" selection-start-line="8" selection-start-column="28" selection-end-line="8" selection-end-column="28" />
+              <caret line="89" column="4" lean-forward="false" selection-start-line="89" selection-start-column="4" selection-end-line="99" selection-end-column="5" />
               <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="MovieObject.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/android/popularmovies/MovieObject.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-159">
-              <caret line="41" column="26" lean-forward="false" selection-start-line="41" selection-start-column="26" selection-end-line="41" selection-end-column="26" />
-              <folding>
-                <element signature="method#MovieObject#1;class#MovieObject#0" expanded="false" />
-                <element signature="method#writeToParcel#0;class#MovieObject#0" expanded="false" />
-              </folding>
             </state>
           </provider>
         </entry>
@@ -133,9 +98,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>poster</find>
-      <find>response</find>
-      <find>TOP_RATED</find>
       <find>SimpleItemTouchHelperCallback</find>
       <find>setTitle</find>
       <find>MovieO</find>
@@ -163,6 +125,9 @@
       <find>MovieProvider</find>
       <find>movieAdapterList</find>
       <find>cursor</find>
+      <find>clear</find>
+      <find>sortMovie</find>
+      <find>movieDB</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -1923,13 +1888,13 @@
         <option value="$PROJECT_DIR$/app/build.gradle" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/example/android/popularmovies/MovieCursorAdapter.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/example/android/popularmovies/MovieDetailActivity.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/example/android/popularmovies/MovieAdapter.java" />
         <option value="$PROJECT_DIR$/../../ud851-Sunshine-student/ud851-Sunshine-student/S09.04-Solution-UsingCursorLoader/app/src/main/java/com/example/android/sunshine/data/WeatherDbHelper.java" />
         <option value="$PROJECT_DIR$/../../ud851-Sunshine-student/ud851-Sunshine-student/S09.04-Solution-UsingCursorLoader/app/src/main/java/com/example/android/sunshine/data/WeatherProvider.java" />
         <option value="$PROJECT_DIR$/../../ud851-Sunshine-student/ud851-Sunshine-student/S09.04-Solution-UsingCursorLoader/app/src/main/java/com/example/android/sunshine/data/WeatherContract.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/example/android/popularmovies/MovieContract.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/example/android/popularmovies/MovieProvider.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/example/android/popularmovies/DatabaseHelper.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/example/android/popularmovies/MovieAdapter.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/example/android/popularmovies/MainActivity.java" />
       </list>
     </option>
@@ -2234,7 +2199,7 @@
   <component name="PropertiesComponent">
     <property name="android.sdk.path" value="$USER_HOME$/AppData/Local/Android/Sdk" />
     <property name="settings.editor.selected.configurable" value="android.sdk-updates" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../ud851-Sunshine-student/ud851-Sunshine-student/S09.04-Solution-UsingCursorLoader" />
     <property name="device.picker.selection" value="Pixel_2_XL_API_26" />
     <property name="last_directory_selection" value="$PROJECT_DIR$/app/src/main/res/drawable" />
     <property name="android.profiler.active" value="true" />
@@ -2334,7 +2299,7 @@
       <option name="ACTIVITY_CLASS" value="" />
       <method>
         <option name="Android.Gradle.BeforeRunTask" enabled="true" />
-        <option name="com.android.instantApps.provision.BeforeRunTask" enabled="true" clearCache="false" clearProvisionedDevices="false" myTimestamp="1521457690499" />
+        <option name="com.android.instantApps.provision.BeforeRunTask" enabled="true" clearCache="false" clearProvisionedDevices="false" myTimestamp="1521466930124" />
       </method>
     </configuration>
     <configuration default="true" type="AndroidTestRunConfigurationType" factoryName="Android Instrumented Tests">
@@ -2382,7 +2347,7 @@
       </Profilers>
       <method>
         <option name="Android.Gradle.BeforeRunTask" enabled="true" />
-        <option name="com.android.instantApps.provision.BeforeRunTask" enabled="true" clearCache="false" clearProvisionedDevices="false" myTimestamp="1521457690499" />
+        <option name="com.android.instantApps.provision.BeforeRunTask" enabled="true" clearCache="false" clearProvisionedDevices="false" myTimestamp="1521466930124" />
       </method>
     </configuration>
     <configuration default="true" type="Application" factoryName="Application">
@@ -2544,7 +2509,7 @@
       <option name="ACTIVITY_CLASS" value="" />
       <method>
         <option name="Android.Gradle.BeforeRunTask" enabled="true" />
-        <option name="com.android.instantApps.provision.BeforeRunTask" enabled="true" clearCache="false" clearProvisionedDevices="false" myTimestamp="1521457690500" />
+        <option name="com.android.instantApps.provision.BeforeRunTask" enabled="true" clearCache="false" clearProvisionedDevices="false" myTimestamp="1521466930125" />
       </method>
     </configuration>
     <list size="1">
@@ -2597,7 +2562,7 @@
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Logcat" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4622951" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Logcat" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.39344263" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Captures" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Gradle Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
@@ -2660,7 +2625,7 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/app/src/main/java/com/example/android/popularmovies/MainActivity.java</url>
-          <line>308</line>
+          <line>359</line>
           <properties />
           <option name="timeStamp" value="1" />
         </line-breakpoint>
@@ -2967,21 +2932,6 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/android/popularmovies/MovieCursorAdapter.java" />
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/android/popularmovies/MovieAdapter.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="36">
-          <caret line="41" column="28" lean-forward="false" selection-start-line="41" selection-start-column="28" selection-end-line="41" selection-end-column="28" />
-          <folding>
-            <element signature="e#1681#1682#0" expanded="true" />
-            <element signature="e#1709#1710#0" expanded="true" />
-            <element signature="e#2266#2469#0" expanded="true" />
-            <element signature="e#2468#2469#0" expanded="true" />
-            <element signature="e#4921#4922#0" expanded="true" />
-            <element signature="e#4967#4968#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/android/popularmovies/MovieDetailActivity.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="592">
@@ -3007,16 +2957,6 @@
         <state relative-caret-position="5040">
           <caret line="166" column="0" lean-forward="false" selection-start-line="166" selection-start-column="0" selection-end-line="166" selection-end-column="0" />
           <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/android/popularmovies/MovieProvider.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1296">
-          <caret line="52" column="8" lean-forward="false" selection-start-line="52" selection-start-column="8" selection-end-line="52" selection-end-column="8" />
-          <folding>
-            <element signature="method#query#0;class#MovieProvider#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -3047,6 +2987,16 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/android/popularmovies/MovieProvider.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="540">
+          <caret line="52" column="8" lean-forward="false" selection-start-line="52" selection-start-column="8" selection-end-line="52" selection-end-column="8" />
+          <folding>
+            <element signature="method#query#0;class#MovieProvider#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/android/popularmovies/DatabaseHelper.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="62">
@@ -3059,27 +3009,36 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/android/popularmovies/MainActivity.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="647">
-          <caret line="203" column="47" lean-forward="true" selection-start-line="203" selection-start-column="47" selection-end-line="203" selection-end-column="47" />
+        <state relative-caret-position="423">
+          <caret line="265" column="8" lean-forward="false" selection-start-line="265" selection-start-column="8" selection-end-line="266" selection-end-column="52" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="method#showDetailActivity#0;class#MainActivity#0" expanded="false" />
-            <marker date="1521456403030" expanded="false" signature="9986:13252" ph="{...}" />
-            <marker date="1521456403030" expanded="false" signature="10407:10423" ph="&quot;Sort By&quot;" />
-            <marker date="1521456403030" expanded="false" signature="10450:10473" ph="&quot;Filter content by:&quot;" />
-            <marker date="1521456403030" expanded="false" signature="10580:10770" ph="(dialog, view, which, text) → {" />
-            <marker date="1521456403030" expanded="false" signature="13151:13174" ph="}" />
-            <marker date="1521456403030" expanded="false" signature="13206:13220" ph="&quot;Apply&quot;" />
-            <marker date="1521456403030" expanded="false" signature="13297:13308" ph=" { " />
-            <marker date="1521456403030" expanded="false" signature="13325:13331" ph=" }" />
-            <marker date="1521456403030" expanded="false" signature="13402:13413" ph=" { " />
-            <marker date="1521456403030" expanded="false" signature="13449:13455" ph=" }" />
-            <marker date="1521456403030" expanded="false" signature="13540:13605" ph="{...}" />
-            <marker date="1521456403030" expanded="false" signature="13670:13681" ph=" { " />
-            <marker date="1521456403030" expanded="false" signature="13720:13726" ph=" }" />
-            <marker date="1521456403030" expanded="false" signature="13793:13913" ph="{...}" />
-            <marker date="1521456403030" expanded="false" signature="13985:14315" ph="{...}" />
+            <element signature="method#sortMoviesBy#0;class#MainActivity#0" expanded="false" />
+            <element signature="method#getFavourites#0;class#MainActivity#0" expanded="false" />
+            <marker date="1521465855961" expanded="false" signature="12553:12569" ph="&quot;Sort By&quot;" />
+            <marker date="1521465855961" expanded="false" signature="12596:12619" ph="&quot;Filter content by:&quot;" />
+            <marker date="1521465855961" expanded="false" signature="12726:12916" ph="(dialog, view, which, text) → {" />
+            <marker date="1521465855961" expanded="false" signature="15297:15320" ph="}" />
+            <marker date="1521465855961" expanded="false" signature="15352:15366" ph="&quot;Apply&quot;" />
+            <marker date="1521465855961" expanded="false" signature="15443:15454" ph=" { " />
+            <marker date="1521465855961" expanded="false" signature="15471:15477" ph=" }" />
+            <marker date="1521465855961" expanded="false" signature="15548:15559" ph=" { " />
+            <marker date="1521465855961" expanded="false" signature="15595:15601" ph=" }" />
+            <marker date="1521465855961" expanded="false" signature="15686:15751" ph="{...}" />
+            <marker date="1521465855961" expanded="false" signature="15816:15827" ph=" { " />
+            <marker date="1521465855961" expanded="false" signature="15866:15872" ph=" }" />
+            <marker date="1521465855961" expanded="false" signature="15939:16059" ph="{...}" />
+            <marker date="1521465855961" expanded="false" signature="16131:16461" ph="{...}" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/android/popularmovies/MovieAdapter.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="62">
+          <caret line="89" column="4" lean-forward="false" selection-start-line="89" selection-start-column="4" selection-end-line="99" selection-end-column="5" />
+          <folding />
         </state>
       </provider>
     </entry>
