@@ -1,19 +1,14 @@
 package com.example.android.popularmovies;
 
-import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.LoaderManager;
-import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -23,19 +18,17 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.example.android.popularmovies.ObjectsAndAdapters.MovieAdapter;
+import com.example.android.popularmovies.ObjectsAndAdapters.MovieObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
 import okhttp3.HttpUrl;
 import okhttp3.Interceptor;
@@ -211,7 +204,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                         data.getDouble(data.getColumnIndex( MovieProvider.RATING)),
                         data.getString(data.getColumnIndex( MovieProvider.BACKDROP_PATH)));
                 databaseMovieList.add(movieObject);
-                System.out.println("looping " + databaseMovieList.size());
             } while (data.moveToNext());
         }
         data.moveToFirst();
@@ -235,7 +227,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private void filterDialog() {
         int indexChecked = -1;
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        System.out.println(SORT_PREF);
         switch (SORT_PREF){
             case TOP_RATED:
                 indexChecked = 1;
@@ -264,7 +255,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                                 editor.putString(SORT_ORDER, POPULAR);
                                 editor.apply();
                                 SORT_PREF = prefs.getString(SORT_ORDER,POPULAR);
-                                System.out.println(SORT_PREF);
                                 sortMoviesBy(SORT_PREF);
                                 return true;
                             }
@@ -272,7 +262,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                                 editor.putString(SORT_ORDER, TOP_RATED);
                                 editor.apply();
                                 SORT_PREF = prefs.getString(SORT_ORDER , POPULAR);
-                                System.out.println(SORT_PREF);
                                 sortMoviesBy(SORT_PREF);
                                 return true;
                             }
@@ -280,7 +269,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                                 editor.putString(SORT_ORDER, FAVOURITES);
                                 editor.apply();
                                 SORT_PREF = prefs.getString(SORT_ORDER , POPULAR);
-                                System.out.println(SORT_PREF);
                                 sortMoviesBy(SORT_PREF);
                                 return true;
                             }

@@ -3,6 +3,8 @@ package com.example.android.popularmovies;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 
+import com.example.android.popularmovies.ObjectsAndAdapters.touchHelperAdapter;
+
 
 public class touchHelperCallback extends ItemTouchHelper.Callback {
 

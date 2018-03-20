@@ -1,5 +1,6 @@
 package com.example.android.popularmovies;
 
+import com.example.android.popularmovies.ObjectsAndAdapters.MovieObject;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;

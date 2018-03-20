@@ -26,6 +26,10 @@ import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.example.android.popularmovies.ObjectsAndAdapters.MovieObject;
+import com.example.android.popularmovies.ObjectsAndAdapters.MovieTrailerAdapter;
+import com.example.android.popularmovies.ObjectsAndAdapters.MovieTrailerObject;
 import com.example.android.popularmovies.tools.ImageSaver;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
@@ -83,13 +87,7 @@ public class MovieDetailActivity extends AppCompatActivity {
             movieObject = (MovieObject) data.getParcelable("movie");
             populateViews(movieObject);
             loadImage(movieObject,imageView);
-            /*
-            if (data.containsKey("column")){
-                System.out.println("has key");
-                _ID = data.getInt("column");
-            }
-            */
-            //favourite = exists(movieObject.getTitle());
+            favourite = exists(String.valueOf(movieObject.getId()));
         }
         toolbar.setTitle("");
         setSupportActionBar(toolbar);
@@ -129,7 +127,7 @@ public class MovieDetailActivity extends AppCompatActivity {
             public void onClick(View view) {
                     if (favourite){
                         fab.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_star_border_white_24dp));
-                        removeFavourite(movieObject.getTitle());
+                        removeFavourite(String.valueOf(movieObject.getId()));
                     }
                     else{
                         fab.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_star_white_24dp));
@@ -234,7 +232,7 @@ public class MovieDetailActivity extends AppCompatActivity {
         movieDB.endTransaction();
         */
         //int taskDeleted;
-        String selection = "movie_id";
+        String selection = "movie_id=?";
         int movieId = movieObject.getId();
         String[] selectionArgs = new String[]{String.valueOf(movieId)};
         Uri uri = MovieProvider.CONTENT_URI;
@@ -243,7 +241,7 @@ public class MovieDetailActivity extends AppCompatActivity {
     }
 
     public boolean exists(String id){
-            String selectString = "SELECT * FROM " + MovieContract.MovieEntry.TABLE_NAME + " WHERE " + MovieContract.MovieEntry._ID + " =?";
+            String selectString = "SELECT * FROM " + MovieContract.MovieEntry.TABLE_NAME + " WHERE " + MovieContract.MovieEntry.MOVIE_DATABASE_ID + " =?";
             Cursor cursor = movieDB.rawQuery(selectString, new String[] {id});
             boolean hasObject = false;
             if(cursor.moveToFirst()){
