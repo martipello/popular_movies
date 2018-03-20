@@ -22,7 +22,7 @@
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
             app:toolbarId="@+id/toolbar">
 
-            <com.example.android.popularmovies.AspectRatioImageView
+            <com.example.android.popularmovies.tools.AspectRatioImageView
                 android:id="@+id/expandedImage"
                 android:layout_width="match_parent"
                 android:layout_height="200dp"

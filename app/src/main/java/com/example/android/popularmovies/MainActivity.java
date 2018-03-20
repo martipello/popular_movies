@@ -51,6 +51,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
     public String filter;
+    private final static String SORT_ORDER = "SORT_ORDER";
+    private String SORT_PREF = "";
     private final static String POPULAR = "popular";
     private final static String TOP_RATED = "top_rated";
     private final static String FAVOURITES = "favourites";
@@ -60,9 +62,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private static final int LOADER = 44;
     public MovieAdapter movieAdapter;
     MoviePageResults pageResults;
-    public boolean sortByPopular;
-    public boolean sortByRated;
-    public boolean sortByFav;
     private static ItemTouchHelper mItemTouchHelper;
     private StaggeredGridLayoutManager staggeredGridLayoutManagerVertical;
     private SwipeRefreshLayout swipeRefreshLayout;
@@ -84,14 +83,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         SharedPreferences.Editor editor = prefs.edit();
         if (!prefs.getBoolean("RAN_ONCE",false)){
             editor.putBoolean("RAN_ONCE",true);
-            editor.putBoolean(TOP_RATED, true);
-            editor.putBoolean(POPULAR, false);
-            editor.putBoolean(FAVOURITES, false);
+            editor.putString(SORT_ORDER, TOP_RATED);
             editor.apply();
         }
-        sortByRated = prefs.getBoolean(TOP_RATED, false);
-        sortByPopular = prefs.getBoolean(POPULAR, false);
-        sortByFav = prefs.getBoolean(FAVOURITES, false);
+        SORT_PREF = prefs.getString(SORT_ORDER,TOP_RATED);
         staggeredGridLayoutManagerVertical = new StaggeredGridLayoutManager(columns,StaggeredGridLayoutManager.VERTICAL);
         recyclerView = (RecyclerView) findViewById(R.id.list_view);
         DatabaseHelper databaseHelper = new DatabaseHelper(this);
@@ -106,15 +101,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             }
         };
         movieAdapter = new MovieAdapter(movieList,MainActivity.this,itemTouchListener,false);
-        if (sortByRated){
-            sortMoviesBy(TOP_RATED);
-        }
-        else if (sortByPopular){
-            sortMoviesBy(POPULAR);
-        }
-        else if (sortByFav){
-            sortMoviesBy(FAVOURITES);
-        }
+        sortMoviesBy(SORT_PREF);
         ItemTouchHelper.Callback callback =
                 new touchHelperCallback(movieAdapter);
         mItemTouchHelper = new ItemTouchHelper(callback);
@@ -125,15 +112,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                if (sortByRated)
-                    sortMoviesBy(TOP_RATED);
-                if (sortByPopular)
-                    sortMoviesBy(POPULAR);
-                if (sortByFav)
-                    sortMoviesBy(FAVOURITES);
+                sortMoviesBy(SORT_PREF);
             }
         });
-
     }
 
     public void showDetailActivity(int position){
@@ -151,47 +132,49 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     }
 
     public void sortMoviesBy(String sortOrder) {
-        if(!sortByFav){
-            movieList.clear();
-            HttpLoggingInterceptor httpLoggingInterceptor = new HttpLoggingInterceptor();
-            httpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-            OkHttpClient okHttpClient = new OkHttpClient.Builder().addInterceptor(new Interceptor() {
-                @Override
-                public okhttp3.Response intercept(Chain chain) throws IOException {
-                    Request request = chain.request();
-                    HttpUrl url = request.url().newBuilder().addQueryParameter(
-                            "api_key", BuildConfig.API_KEY).build();
-                    request = request.newBuilder().url(url).build();
-                    return chain.proceed(request);
-                }
-            }).build();
-            Retrofit retrofit = new Retrofit.Builder()
-                    .client(okHttpClient)
-                    .baseUrl(getString(R.string.base_url))
-                    .addConverterFactory(GsonConverterFactory.create())
-                    .build();
-            final MoviesInterface movieService = retrofit.create(MoviesInterface.class);
-            Call<MoviePageResults> call = movieService.sortMoviesBy(sortOrder);
-            call.enqueue(new Callback<MoviePageResults>() {
-                @Override
-                public void onResponse(Call<MoviePageResults> call, Response<MoviePageResults> response) {
-                    pageResults = response.body();
-                    movieList = response.body().getResults();
-                    movieAdapter.refreshMyList(movieList,true);
-                    if (movieAdapter.getItemCount() > 0){
-                        connectionText.setVisibility(View.INVISIBLE);
-                    }else{
-                        connectionText.setVisibility(View.VISIBLE);
-                    }
-                }
-                @Override
-                public void onFailure(Call<MoviePageResults> call, Throwable t) {
-                    movieAdapter.clear();
-                    connectionText.setVisibility(View.VISIBLE);
-                }
-            });
-        }else{
-            getSupportLoaderManager().initLoader(LOADER, null, this);
+        switch(sortOrder){
+            case FAVOURITES :
+                getSupportLoaderManager().initLoader(LOADER, null, this);
+                break;
+                default:
+                    movieList.clear();
+                    HttpLoggingInterceptor httpLoggingInterceptor = new HttpLoggingInterceptor();
+                    httpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+                    OkHttpClient okHttpClient = new OkHttpClient.Builder().addInterceptor(new Interceptor() {
+                        @Override
+                        public okhttp3.Response intercept(Chain chain) throws IOException {
+                            Request request = chain.request();
+                            HttpUrl url = request.url().newBuilder().addQueryParameter(
+                                    "api_key", BuildConfig.API_KEY).build();
+                            request = request.newBuilder().url(url).build();
+                            return chain.proceed(request);
+                        }
+                    }).build();
+                    Retrofit retrofit = new Retrofit.Builder()
+                            .client(okHttpClient)
+                            .baseUrl(getString(R.string.base_url))
+                            .addConverterFactory(GsonConverterFactory.create())
+                            .build();
+                    final MoviesInterface movieService = retrofit.create(MoviesInterface.class);
+                    Call<MoviePageResults> call = movieService.sortMoviesBy(sortOrder);
+                    call.enqueue(new Callback<MoviePageResults>() {
+                        @Override
+                        public void onResponse(Call<MoviePageResults> call, Response<MoviePageResults> response) {
+                            pageResults = response.body();
+                            movieList = response.body().getResults();
+                            movieAdapter.refreshMyList(movieList,true);
+                            if (movieAdapter.getItemCount() > 0){
+                                connectionText.setVisibility(View.INVISIBLE);
+                            }else{
+                                connectionText.setVisibility(View.VISIBLE);
+                            }
+                        }
+                        @Override
+                        public void onFailure(Call<MoviePageResults> call, Throwable t) {
+                            movieAdapter.clear();
+                            connectionText.setVisibility(View.VISIBLE);
+                        }
+                    });
         }
         swipeRefreshLayout.setRefreshing(false);
     }
@@ -212,6 +195,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @Override
     public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor data) {
+
         ArrayList<MovieObject> databaseMovieList = new ArrayList<>();
         if (data != null && data.getCount() > 0){
             cursor = data;
@@ -251,13 +235,18 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private void filterDialog() {
         int indexChecked = -1;
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        if (prefs.getBoolean(FAVOURITES , false))
-            indexChecked = 2;
-        if (prefs.getBoolean(TOP_RATED , false))
-            indexChecked = 1;
-        if (prefs.getBoolean(POPULAR , false))
-            indexChecked = 0;
-
+        System.out.println(SORT_PREF);
+        switch (SORT_PREF){
+            case TOP_RATED:
+                indexChecked = 1;
+                break;
+            case POPULAR:
+                indexChecked = 0;
+                break;
+            case FAVOURITES:
+                indexChecked = 2;
+                break;
+        }
         new MaterialDialog.Builder(this)
                 .title(R.string.sort_by)
                 .content(R.string.filter_content)
@@ -272,36 +261,27 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                             case -1: {
                             }
                             case 0: {
-                                editor.putBoolean(FAVOURITES, false);
-                                editor.putBoolean(TOP_RATED, false);
-                                editor.putBoolean(POPULAR, true);
+                                editor.putString(SORT_ORDER, POPULAR);
                                 editor.apply();
-                                sortByFav = prefs.getBoolean(FAVOURITES,false);
-                                sortByRated = prefs.getBoolean(TOP_RATED, false);
-                                sortByPopular = prefs.getBoolean(POPULAR, false);
-                                sortMoviesBy(POPULAR);
+                                SORT_PREF = prefs.getString(SORT_ORDER,POPULAR);
+                                System.out.println(SORT_PREF);
+                                sortMoviesBy(SORT_PREF);
                                 return true;
                             }
                             case 1: {
-                                editor.putBoolean(FAVOURITES, false);
-                                editor.putBoolean(TOP_RATED, true);
-                                editor.putBoolean(POPULAR, false);
+                                editor.putString(SORT_ORDER, TOP_RATED);
                                 editor.apply();
-                                sortByFav = prefs.getBoolean(FAVOURITES,false);
-                                sortByRated = prefs.getBoolean(TOP_RATED, false);
-                                sortByPopular = prefs.getBoolean(POPULAR, false);
-                                sortMoviesBy(TOP_RATED);
+                                SORT_PREF = prefs.getString(SORT_ORDER , POPULAR);
+                                System.out.println(SORT_PREF);
+                                sortMoviesBy(SORT_PREF);
                                 return true;
                             }
                             case 2: {
-                                editor.putBoolean(FAVOURITES, true);
-                                editor.putBoolean(TOP_RATED, false);
-                                editor.putBoolean(POPULAR, false);
+                                editor.putString(SORT_ORDER, FAVOURITES);
                                 editor.apply();
-                                sortByFav = prefs.getBoolean(FAVOURITES,false);
-                                sortByRated = prefs.getBoolean(TOP_RATED, false);
-                                sortByPopular = prefs.getBoolean(POPULAR, false);
-                                sortMoviesBy(FAVOURITES);
+                                SORT_PREF = prefs.getString(SORT_ORDER , POPULAR);
+                                System.out.println(SORT_PREF);
+                                sortMoviesBy(SORT_PREF);
                                 return true;
                             }
                         }

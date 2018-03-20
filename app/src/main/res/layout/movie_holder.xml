@@ -11,7 +11,7 @@
         android:layout_height="match_parent"
         android:id="@+id/item">
 
-    <com.example.android.popularmovies.AspectRatioImageButton
+    <com.example.android.popularmovies.tools.AspectRatioImageButton
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/holder_image"

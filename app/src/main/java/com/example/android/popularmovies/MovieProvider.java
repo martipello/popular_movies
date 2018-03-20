@@ -24,6 +24,8 @@ import java.util.Objects;
 
 public class MovieProvider extends ContentProvider {
 
+    static final int MOVIE = 1;
+    static final int MOVIE_ID = 2;
     private SQLiteDatabase sqLiteDatabase;
     static final String PROVIDER_NAME = "com.example.android.popularmovies.MovieProvider";
     static final String URL = "content://" + PROVIDER_NAME + "/movie";
@@ -37,13 +39,12 @@ public class MovieProvider extends ContentProvider {
     static final String RELEASE_DATE = "release_date";
     static final String RATING = "rating";
     private static HashMap<String, String> MOVIE_PROJECTION_MAP;
-    static final int MOVIE = 1;
-    static final int MOVIE_ID = 2;
-    static final UriMatcher uriMatcher;
-    static {
-        uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
+    static final UriMatcher mUriMatcher = buildUriMatcher();
+    static UriMatcher buildUriMatcher(){
+        final UriMatcher uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
         uriMatcher.addURI(PROVIDER_NAME, "movie", MOVIE);
         uriMatcher.addURI(PROVIDER_NAME, "movie/#", MOVIE_ID);
+        return uriMatcher;
     }
     private DatabaseHelper databaseHelper;
 
@@ -62,7 +63,7 @@ public class MovieProvider extends ContentProvider {
                         @Nullable String s1) {
         SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
         qb.setTables(MovieContract.MovieEntry.TABLE_NAME);
-        switch (uriMatcher.match(uri)){
+        switch (mUriMatcher.match(uri)){
             case MOVIE:
                 qb.setProjectionMap(MOVIE_PROJECTION_MAP);
                 break;
@@ -82,7 +83,7 @@ public class MovieProvider extends ContentProvider {
     @Nullable
     @Override
     public String getType(@NonNull Uri uri) {
-        switch (uriMatcher.match(uri)){
+        switch (mUriMatcher.match(uri)){
             case MOVIE:
                 return "vnd.android.cursor.dir/vnd.example.movie";
             case MOVIE_ID:
@@ -106,7 +107,7 @@ public class MovieProvider extends ContentProvider {
     @Override
     public int delete(@NonNull Uri uri, @Nullable String s, @Nullable String[] strings) {
         int count = 0;
-        switch (uriMatcher.match(uri)){
+        switch (mUriMatcher.match(uri)){
             case MOVIE:
                 count = sqLiteDatabase.delete(MovieContract.MovieEntry.TABLE_NAME, s ,strings);
                 break;
@@ -125,7 +126,7 @@ public class MovieProvider extends ContentProvider {
     @Override
     public int update(@NonNull Uri uri, @Nullable ContentValues contentValues, @Nullable String s, @Nullable String[] strings) {
             int count = 0;
-            switch (uriMatcher.match(uri)) {
+            switch (mUriMatcher.match(uri)) {
                 case MOVIE:
                     count = sqLiteDatabase.update(MovieContract.MovieEntry.TABLE_NAME, contentValues, s, strings);
                     break;

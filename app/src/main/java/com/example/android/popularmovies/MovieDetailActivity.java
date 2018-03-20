@@ -13,7 +13,6 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
@@ -22,19 +21,16 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
-
+import com.example.android.popularmovies.tools.ImageSaver;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
-
 import java.io.IOException;
 import java.util.ArrayList;
-
 import okhttp3.HttpUrl;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
@@ -49,6 +45,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class MovieDetailActivity extends AppCompatActivity {
     CollapsingToolbarLayout collapsingToolbarLayout;
     private final static String FAVOURITES = "favourites";
+    private final static String POPULAR = "popular";
+    private final static String SORT_ORDER = "SORT_ORDER";
     Toolbar toolbar;
     String title;
     String image;
@@ -91,7 +89,7 @@ public class MovieDetailActivity extends AppCompatActivity {
                 _ID = data.getInt("column");
             }
             */
-            favourite = exists(movieObject.getTitle());
+            //favourite = exists(movieObject.getTitle());
         }
         toolbar.setTitle("");
         setSupportActionBar(toolbar);
@@ -205,10 +203,7 @@ public class MovieDetailActivity extends AppCompatActivity {
     public void addFavourite(MovieObject movieObject, Bitmap bitmap){
         favourite = true;
         ContentValues values = new ContentValues();
-        new ImageSaver(this).
-                setFileName(movieObject.getId() + ".png").
-                setDirectoryName("fav_movies").
-                save(bitmap);
+        new ImageSaver(this).setFileName(movieObject.getId() + ".png").setDirectoryName("fav_movies").save(bitmap);
         values.put(MovieContract.MovieEntry.TITLE, movieObject.getTitle());
         values.put(MovieContract.MovieEntry.MOVIE_DATABASE_ID, movieObject.getId());
         values.put(MovieContract.MovieEntry.OVERVIEW, movieObject.getOverview());
@@ -232,11 +227,19 @@ public class MovieDetailActivity extends AppCompatActivity {
 
     public void removeFavourite(String id){
         //find a way to get an id
+        /*
         favourite = false;
         movieDB.beginTransaction();
         movieDB.delete(MovieContract.MovieEntry.TABLE_NAME, id , null);
         movieDB.endTransaction();
-
+        */
+        //int taskDeleted;
+        String selection = "movie_id";
+        int movieId = movieObject.getId();
+        String[] selectionArgs = new String[]{String.valueOf(movieId)};
+        Uri uri = MovieProvider.CONTENT_URI;
+        getContentResolver().delete(uri, selection, selectionArgs);
+        Toast.makeText(getBaseContext(), "Movie " + title + " was removed from favorites.", Toast.LENGTH_LONG).show();
     }
 
     public boolean exists(String id){
@@ -256,38 +259,41 @@ public class MovieDetailActivity extends AppCompatActivity {
 
     public void loadImage(MovieObject movieObject, final ImageView imageView){
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        if (!prefs.getBoolean(FAVOURITES, false)){
-            Picasso.with(this).load(PathResolver.resolveImageURL(image)).placeholder(R.drawable.placeholder).into(imageView, new Callback() {
-                @Override public void onSuccess() {
-                    Bitmap bitmap = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
-                    myBitmap = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
-                    Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
-                        public void onGenerated(Palette palette) {
-                            applyPalette(palette);
-                        }
-                    });
-                }
-                @Override public void onError() {
-                }
-            });
-        }else{
-            Uri input = new ImageSaver(this).
-                    setFileName(movieObject.getId() + ".png").
-                    setDirectoryName("fav_movies").
-                    find();
-            Picasso.with(this).load(input).placeholder(R.drawable.placeholder).into(imageView, new Callback() {
-                @Override public void onSuccess() {
-                    Bitmap bitmap = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
-                    myBitmap = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
-                    Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
-                        public void onGenerated(Palette palette) {
-                            applyPalette(palette);
-                        }
-                    });
-                }
-                @Override public void onError() {
-                }
-            });
+        String s = prefs.getString(SORT_ORDER,POPULAR);
+        switch (s){
+            case FAVOURITES :
+                Uri input = new ImageSaver(context).
+                        setFileName(movieObject.getId() + ".png").
+                        setDirectoryName("fav_movies").
+                        find();
+                Picasso.with(this).load(input).placeholder(R.drawable.placeholder).into(imageView, new Callback() {
+                    @Override public void onSuccess() {
+                        Bitmap bitmap = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
+                        myBitmap = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
+                        Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
+                            public void onGenerated(Palette palette) {
+                                applyPalette(palette);
+                            }
+                        });
+                    }
+                    @Override public void onError() {
+                    }
+                });
+                break;
+            default:
+                Picasso.with(this).load(PathResolver.resolveImageURL(image)).placeholder(R.drawable.placeholder).into(imageView, new Callback() {
+                    @Override public void onSuccess() {
+                        Bitmap bitmap = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
+                        myBitmap = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
+                        Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
+                            public void onGenerated(Palette palette) {
+                                applyPalette(palette);
+                            }
+                        });
+                    }
+                    @Override public void onError() {
+                    }
+                });
         }
     }
 
