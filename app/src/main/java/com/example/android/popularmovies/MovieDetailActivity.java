@@ -17,6 +17,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
@@ -28,6 +29,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.android.popularmovies.ObjectsAndAdapters.MovieObject;
+import com.example.android.popularmovies.ObjectsAndAdapters.MovieReviewAdapter;
+import com.example.android.popularmovies.ObjectsAndAdapters.MovieReviewObject;
 import com.example.android.popularmovies.ObjectsAndAdapters.MovieTrailerAdapter;
 import com.example.android.popularmovies.ObjectsAndAdapters.MovieTrailerObject;
 import com.example.android.popularmovies.tools.ImageSaver;
@@ -61,11 +64,14 @@ public class MovieDetailActivity extends AppCompatActivity {
     Context context;
     private static ItemTouchHelper mItemTouchHelper;
     private StaggeredGridLayoutManager staggeredGridLayoutManagerVertical;
+    private LinearLayoutManager linearLayoutManager;
     public MovieTrailerAdapter trailerAdapter;
     public static ArrayList<MovieTrailerObject> trailerList = new ArrayList<>();
-    public RecyclerView recyclerView;
+    public RecyclerView trailerRecyclerView;
+    public MovieReviewAdapter reviewAdapter;
+    public static ArrayList<MovieReviewObject> reviewList = new ArrayList<>();
+    public RecyclerView reviewRecyclerView;
     public Bitmap myBitmap;
-    //public int _ID;
     public boolean favourite;
     private SQLiteDatabase movieDB;
 
@@ -96,7 +102,12 @@ public class MovieDetailActivity extends AppCompatActivity {
         trailerList.clear();
         int columns = getResources().getInteger(R.integer.columns);
         staggeredGridLayoutManagerVertical = new StaggeredGridLayoutManager(columns,StaggeredGridLayoutManager.VERTICAL);
-        recyclerView = (RecyclerView) findViewById(R.id.list_view);
+        trailerRecyclerView = (RecyclerView) findViewById(R.id.trailer_list_view);
+        linearLayoutManager = new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false);
+        reviewRecyclerView = (RecyclerView) findViewById(R.id.review_list_view);
+        //populate lists
+        //getTrailers();
+        getReviews(String.valueOf(movieObject.getId()));
         MovieDetailActivity.OnItemTouchListener itemTouchListener = new MovieDetailActivity.OnItemTouchListener() {
             @Override
             public void onCardClick(View view, int position) {
@@ -106,13 +117,17 @@ public class MovieDetailActivity extends AppCompatActivity {
             }
         };
         trailerAdapter = new MovieTrailerAdapter(trailerList,MovieDetailActivity.this,itemTouchListener);
+        reviewAdapter = new MovieReviewAdapter(reviewList,MovieDetailActivity.this);
         ItemTouchHelper.Callback callback =
                 new touchHelperCallback(trailerAdapter);
         mItemTouchHelper = new ItemTouchHelper(callback);
-        mItemTouchHelper.attachToRecyclerView(recyclerView);
-        recyclerView.setLayoutManager(staggeredGridLayoutManagerVertical);
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-        recyclerView.setAdapter(trailerAdapter);
+        mItemTouchHelper.attachToRecyclerView(trailerRecyclerView);
+        trailerRecyclerView.setLayoutManager(staggeredGridLayoutManagerVertical);
+        trailerRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        trailerRecyclerView.setAdapter(trailerAdapter);
+        reviewRecyclerView.setLayoutManager(linearLayoutManager);
+        reviewRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        reviewRecyclerView.setAdapter(reviewAdapter);
         //toolbar.setExpandedTitleColor(getResources().getColor(android.R.color.transparent));
         fab = (FloatingActionButton) findViewById(R.id.fab);
             if (favourite){
@@ -198,6 +213,50 @@ public class MovieDetailActivity extends AppCompatActivity {
         });
     }
 
+    public void getReviews(String id) {
+        reviewList.clear();
+        HttpLoggingInterceptor httpLoggingInterceptor = new HttpLoggingInterceptor();
+        httpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+        OkHttpClient okHttpClient = new OkHttpClient.Builder().addInterceptor(new Interceptor() {
+            @Override
+            public okhttp3.Response intercept(Chain chain) throws IOException {
+                Request request = chain.request();
+                HttpUrl url = request.url().newBuilder().addQueryParameter(
+                        "api_key", BuildConfig.API_KEY).build();
+                request = request.newBuilder().url(url).build();
+                return chain.proceed(request);
+            }
+        }).build();
+        Retrofit retrofit = new Retrofit.Builder()
+                .client(okHttpClient)
+                .baseUrl(getString(R.string.base_url))
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        final MoviesInterface movieService = retrofit.create(MoviesInterface.class);
+        Call<MovieReviewObject> call = movieService.getMovieReviews(id);
+        call.enqueue(new retrofit2.Callback<MovieReviewObject>() {
+            @Override
+            public void onResponse(Call<MovieReviewObject> call, Response<MovieReviewObject> response) {
+                //pageResults = response.body();
+                reviewList = response.body().getResults();
+                reviewAdapter.refreshMyList(reviewList);
+                if (reviewAdapter.getItemCount() > 0){
+                    //this isnt working for some reason
+                    // also change hardcoded strings to strings.xml
+                    //change toast messages to snackbars
+                    MovieReviewObject mro = new MovieReviewObject("No Reviews", "There are no reviews at present please check back later");
+                    reviewList.add(mro);
+                    reviewAdapter.refreshMyList(reviewList);
+                }
+            }
+            @Override
+            public void onFailure(Call<MovieReviewObject> call, Throwable t) {
+                reviewAdapter.clear();
+                //connectionText.setVisibility(View.VISIBLE);
+            }
+        });
+    }
+
     public void addFavourite(MovieObject movieObject, Bitmap bitmap){
         favourite = true;
         ContentValues values = new ContentValues();
@@ -224,14 +283,6 @@ public class MovieDetailActivity extends AppCompatActivity {
     }
 
     public void removeFavourite(String id){
-        //find a way to get an id
-        /*
-        favourite = false;
-        movieDB.beginTransaction();
-        movieDB.delete(MovieContract.MovieEntry.TABLE_NAME, id , null);
-        movieDB.endTransaction();
-        */
-        //int taskDeleted;
         String selection = "movie_id=?";
         int movieId = movieObject.getId();
         String[] selectionArgs = new String[]{String.valueOf(movieId)};

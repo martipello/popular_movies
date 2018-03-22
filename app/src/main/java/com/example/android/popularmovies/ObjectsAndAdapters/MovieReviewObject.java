@@ -3,6 +3,7 @@ package com.example.android.popularmovies.ObjectsAndAdapters;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -18,6 +19,8 @@ public class MovieReviewObject {
     @Expose
     @SerializedName("content")
     private String content;
+    @SerializedName("results")
+    private ArrayList<MovieReviewObject> reviewResults;
 
     public MovieReviewObject(String author, String content){
         this.author = author;
@@ -40,11 +43,19 @@ public class MovieReviewObject {
         this.content = content;
     }
 
-    public static class MovieTrailerObjectList {
+    public void setResults(ArrayList<MovieReviewObject> results) {
+        this.reviewResults = results;
+    }
+
+    public ArrayList<MovieReviewObject> getResults() {
+        return reviewResults;
+    }
+
+    public static class MovieReviewObjectList {
         @SerializedName("results")
-        private List<MovieReviewObject> movieTrailerObject;
-        public List<MovieReviewObject> getMovieTrailerObjectLists() {
-            return movieTrailerObject;
+        private List<MovieReviewObject> movieReviewObject;
+        public List<MovieReviewObject> getMovieReviewObjectLists() {
+            return movieReviewObject;
         }
     }
 

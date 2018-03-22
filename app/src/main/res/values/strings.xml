@@ -6,7 +6,7 @@
     <string name="top_rated">by top rated</string>
     <string name="favourites">by favourites</string>
     <string name="released">Released : %1$s</string>
-    <string name="summary">Summary : \n%1$s</string>
+    <string name="summary">%1$s</string>
     <string name="apply">Apply</string>
     <string name="cancel">Cancel</string>
     <string name="most_popular">by most popular</string>
