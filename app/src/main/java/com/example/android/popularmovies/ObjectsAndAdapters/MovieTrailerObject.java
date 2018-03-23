@@ -3,11 +3,8 @@ package com.example.android.popularmovies.ObjectsAndAdapters;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.ArrayList;
 import java.util.List;
-
-/**
- * Created by marti on 15/03/2018.
- */
 
 public class MovieTrailerObject {
 
@@ -17,6 +14,8 @@ public class MovieTrailerObject {
     @Expose
     @SerializedName("name")
     private String name;
+    @SerializedName("results")
+    private ArrayList<MovieTrailerObject> trailerResults;
 
     public MovieTrailerObject(String key, String name){
         this.key = key;
@@ -39,6 +38,13 @@ public class MovieTrailerObject {
         this.name = name;
     }
 
+    public ArrayList<MovieTrailerObject> getResults() {
+        return trailerResults;
+    }
+
+    public void setResults(ArrayList<MovieTrailerObject> results) {
+        this.trailerResults = results;
+    }
 
     public static class MovieTrailerObjectList {
         @SerializedName("results")

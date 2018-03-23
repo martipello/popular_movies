@@ -8,6 +8,9 @@
     <string name="released">Released : %1$s</string>
     <string name="summary">%1$s</string>
     <string name="apply">Apply</string>
+    <string name="reviews">Reviews</string>
+    <string name="trailers">Trailers</string>
+    <string name="summarary">Summary : </string>
     <string name="cancel">Cancel</string>
     <string name="most_popular">by most popular</string>
     <string name="most_popular_pref">by most popular</string>

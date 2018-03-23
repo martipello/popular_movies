@@ -313,7 +313,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 return true;
             }
             case R.id.filter: {
-                //showEditDialog();
                 filterDialog();
                 return true;
             }

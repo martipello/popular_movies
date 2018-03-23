@@ -2,17 +2,21 @@ package com.example.android.popularmovies;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.ColorStateList;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
@@ -26,8 +30,6 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
-import android.widget.Toast;
-
 import com.example.android.popularmovies.ObjectsAndAdapters.MovieObject;
 import com.example.android.popularmovies.ObjectsAndAdapters.MovieReviewAdapter;
 import com.example.android.popularmovies.ObjectsAndAdapters.MovieReviewObject;
@@ -48,7 +50,6 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-
 public class MovieDetailActivity extends AppCompatActivity {
     CollapsingToolbarLayout collapsingToolbarLayout;
     private final static String FAVOURITES = "favourites";
@@ -62,6 +63,9 @@ public class MovieDetailActivity extends AppCompatActivity {
     FloatingActionButton fab;
     RatingBar ratingBar;
     Context context;
+    private int sbText;
+    private int sbBack;
+    private int sbAction;
     private static ItemTouchHelper mItemTouchHelper;
     private StaggeredGridLayoutManager staggeredGridLayoutManagerVertical;
     private LinearLayoutManager linearLayoutManager;
@@ -100,17 +104,17 @@ public class MovieDetailActivity extends AppCompatActivity {
         collapsingToolbarLayout.setTitle(title);
         toolbar.setTitle(title);
         trailerList.clear();
-        int columns = getResources().getInteger(R.integer.columns);
+        int columns = getResources().getInteger(R.integer.trailer_columns);
         staggeredGridLayoutManagerVertical = new StaggeredGridLayoutManager(columns,StaggeredGridLayoutManager.VERTICAL);
         trailerRecyclerView = (RecyclerView) findViewById(R.id.trailer_list_view);
         linearLayoutManager = new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false);
         reviewRecyclerView = (RecyclerView) findViewById(R.id.review_list_view);
-        //populate lists
-        //getTrailers();
+        getTrailers(String.valueOf(movieObject.getId()));
         getReviews(String.valueOf(movieObject.getId()));
         MovieDetailActivity.OnItemTouchListener itemTouchListener = new MovieDetailActivity.OnItemTouchListener() {
             @Override
             public void onCardClick(View view, int position) {
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(trailerList.get(position).getKey())));
             }
             @Override
             public void onCardLongClick(View view, int position) {
@@ -128,38 +132,69 @@ public class MovieDetailActivity extends AppCompatActivity {
         reviewRecyclerView.setLayoutManager(linearLayoutManager);
         reviewRecyclerView.setItemAnimator(new DefaultItemAnimator());
         reviewRecyclerView.setAdapter(reviewAdapter);
-        //toolbar.setExpandedTitleColor(getResources().getColor(android.R.color.transparent));
         fab = (FloatingActionButton) findViewById(R.id.fab);
             if (favourite){
                 favourite = true;
-                fab.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_star_white_24dp));
+                fab.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_favorite_white_24dp));
             }else{
-                fab.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_star_border_white_24dp));
                 favourite = false;
+                fab.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_favorite_border_white_24dp));
             }
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                     if (favourite){
-                        fab.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_star_border_white_24dp));
-                        removeFavourite(String.valueOf(movieObject.getId()));
+                        removeFavourite(String.valueOf(movieObject.getId()), view);
                     }
                     else{
-                        fab.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_star_white_24dp));
-                        addFavourite(movieObject, myBitmap);
+                        addFavourite(movieObject, myBitmap, view);
                     }
             }
         });
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
+    public void showSnackbar(final View view, String message, int duration, final boolean undoRedo) {
+        final Snackbar snackbar = Snackbar.make(view, message, duration);
+        snackbar.setAction("UNDO", new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (undoRedo)
+                    addFavourite(movieObject,myBitmap,view);
+                else
+                    removeFavourite(String.valueOf(movieObject.getId()),view);
+            }
+        });
+        snackbar.show();
+        snackbar.setActionTextColor(sbAction);
+        View snackbarView = snackbar.getView();
+        TextView textView = (TextView) snackbarView.findViewById(android.support.design.R.id.snackbar_text);
+        textView.setTextColor(sbText);
+        View sbView = snackbarView;
+        sbView.setBackgroundColor(sbBack);
+    }
+
     private void applyPalette(Palette palette) {
-        int primaryDark = getResources().getColor(R.color.colorAccent);
-        int primary = getResources().getColor(R.color.colorPrimary);
-        collapsingToolbarLayout.setContentScrimColor(palette.getDominantColor(primary));
-        collapsingToolbarLayout.setStatusBarScrimColor(palette.getDominantColor(primaryDark));
-        //toolbar.setExpandedTitleColor(getResources().getColor(android.R.color.transparent));
-        //fab.setBackgroundColour
+        Palette.Swatch vibrantSwatch = palette.getDarkVibrantSwatch();
+        int backgroundColor = getResources().getColor(R.color.colorPrimary);
+        int accent = getResources().getColor(R.color.colorAccent);
+        int textColor = getResources().getColor(R.color.colorPrimaryLight);
+        int lightTextColor = getResources().getColor(R.color.colorPrimaryLight);
+        sbBack = getResources().getColor(R.color.colorPrimaryDark);
+        sbText = getResources().getColor(R.color.colorPrimaryLight);
+        sbAction = getResources().getColor(R.color.colorAccent);
+        if(vibrantSwatch != null){
+            backgroundColor = vibrantSwatch.getRgb();
+            textColor = vibrantSwatch.getTitleTextColor();
+            lightTextColor = vibrantSwatch.getBodyTextColor();
+            sbBack = vibrantSwatch.getRgb();
+            sbText = vibrantSwatch.getTitleTextColor();
+        }
+        collapsingToolbarLayout.setContentScrimColor(palette.getDominantColor(backgroundColor));
+        collapsingToolbarLayout.setStatusBarScrimColor(palette.getDominantColor(backgroundColor));
+        collapsingToolbarLayout.setExpandedTitleColor(textColor);
+        collapsingToolbarLayout.setCollapsedTitleTextColor(lightTextColor);
+        fab.setBackgroundTintList(ColorStateList.valueOf(backgroundColor));
     }
 
     private void populateViews(MovieObject movieObject){
@@ -172,7 +207,7 @@ public class MovieDetailActivity extends AppCompatActivity {
         ratingBar.setNumStars((int)movieObject.getRating() / 2);
     }
 
-    public void getTrailers(String sortOrder) {
+    public void getTrailers(String id) {
         trailerList.clear();
         HttpLoggingInterceptor httpLoggingInterceptor = new HttpLoggingInterceptor();
         httpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
@@ -192,23 +227,21 @@ public class MovieDetailActivity extends AppCompatActivity {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         final MoviesInterface movieService = retrofit.create(MoviesInterface.class);
-        Call<MoviePageResults> call = movieService.sortMoviesBy(sortOrder);
-        call.enqueue(new retrofit2.Callback<MoviePageResults>() {
+        Call<MovieTrailerObject> call = movieService.getMovieTrailer(id);
+        call.enqueue(new retrofit2.Callback<MovieTrailerObject>() {
             @Override
-            public void onResponse(Call<MoviePageResults> call, Response<MoviePageResults> response) {
-                //pageResults = response.body();
-                //trailerList = response.body().getResults();
+            public void onResponse(Call<MovieTrailerObject> call, Response<MovieTrailerObject> response) {
+                trailerList = response.body().getResults();
                 trailerAdapter.refreshMyList(trailerList);
-                if (trailerAdapter.getItemCount() > 0){
-                    //connectionText.setVisibility(View.INVISIBLE);
-                }else{
-                    //connectionText.setVisibility(View.VISIBLE);
+                if (trailerAdapter.getItemCount() <= 0){
+                    MovieTrailerObject mto = new MovieTrailerObject("No Trailers", "There are no trailers at present please check back later");
+                    trailerList.add(mto);
+                    trailerAdapter.refreshMyList(trailerList);
                 }
             }
             @Override
-            public void onFailure(Call<MoviePageResults> call, Throwable t) {
+            public void onFailure(Call<MovieTrailerObject> call, Throwable t) {
                 trailerAdapter.clear();
-                //connectionText.setVisibility(View.VISIBLE);
             }
         });
     }
@@ -237,13 +270,9 @@ public class MovieDetailActivity extends AppCompatActivity {
         call.enqueue(new retrofit2.Callback<MovieReviewObject>() {
             @Override
             public void onResponse(Call<MovieReviewObject> call, Response<MovieReviewObject> response) {
-                //pageResults = response.body();
                 reviewList = response.body().getResults();
                 reviewAdapter.refreshMyList(reviewList);
-                if (reviewAdapter.getItemCount() > 0){
-                    //this isnt working for some reason
-                    // also change hardcoded strings to strings.xml
-                    //change toast messages to snackbars
+                if (reviewAdapter.getItemCount() <= 0){
                     MovieReviewObject mro = new MovieReviewObject("No Reviews", "There are no reviews at present please check back later");
                     reviewList.add(mro);
                     reviewAdapter.refreshMyList(reviewList);
@@ -252,13 +281,13 @@ public class MovieDetailActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call<MovieReviewObject> call, Throwable t) {
                 reviewAdapter.clear();
-                //connectionText.setVisibility(View.VISIBLE);
             }
         });
     }
 
-    public void addFavourite(MovieObject movieObject, Bitmap bitmap){
+    public void addFavourite(MovieObject movieObject, Bitmap bitmap, View v){
         favourite = true;
+        fab.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_favorite_white_24dp));
         ContentValues values = new ContentValues();
         new ImageSaver(this).setFileName(movieObject.getId() + ".png").setDirectoryName("fav_movies").save(bitmap);
         values.put(MovieContract.MovieEntry.TITLE, movieObject.getTitle());
@@ -280,15 +309,22 @@ public class MovieDetailActivity extends AppCompatActivity {
         {
             movieDB.endTransaction();
         }
+        String message = movieObject.getTitle() + " added to favourites";
+        int duration = Snackbar.LENGTH_SHORT;
+        showSnackbar(v, message, duration,false);
     }
 
-    public void removeFavourite(String id){
+    public void removeFavourite(String id, View v){
+        favourite = false;
+        fab.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_favorite_border_white_24dp));
         String selection = "movie_id=?";
         int movieId = movieObject.getId();
         String[] selectionArgs = new String[]{String.valueOf(movieId)};
         Uri uri = MovieProvider.CONTENT_URI;
         getContentResolver().delete(uri, selection, selectionArgs);
-        Toast.makeText(getBaseContext(), "Movie " + title + " was removed from favorites.", Toast.LENGTH_LONG).show();
+        String message = movieObject.getTitle() + " removed from favourites";
+        int duration = Snackbar.LENGTH_SHORT;
+        showSnackbar(v, message, duration,true);
     }
 
     public boolean exists(String id){

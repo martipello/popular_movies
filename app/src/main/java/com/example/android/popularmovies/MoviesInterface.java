@@ -20,5 +20,5 @@ public interface MoviesInterface {
         @GET("movie/{id}/reviews")
         Call<MovieReviewObject> getMovieReviews(@Path("id") String id);
         @GET("movie/{id}/videos")
-        Call<ArrayList<MovieTrailerObject>> getMovieTrailer(@Path("id") String id);
+        Call<MovieTrailerObject> getMovieTrailer(@Path("id") String id);
 }

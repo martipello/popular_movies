@@ -3,7 +3,7 @@
     android:layout_height="@dimen/trailer_holder"
     android:layout_width="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    app:cardElevation="@dimen/custom_elevation"
+    app:cardElevation="2dp"
     app:cardBackgroundColor="@color/cardview_light_background">
 
     <RelativeLayout
@@ -15,7 +15,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
-            android:textSize="18sp"
             android:layout_alignParentStart="true"
             android:layout_marginStart="@dimen/custom_margin"
             android:layout_marginLeft="@dimen/custom_margin"
